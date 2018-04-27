@@ -82,6 +82,10 @@
                                 <span class="post-author"><a href="#">{{ post.author }}</a></span>
                                 <span class="comments-link"><a href="#">4 评论</a></span>
                                 <span class="views-count"><a href="{{ post.get_absolute_url }}">{{ post.views }} 阅读</a></span>
+                                {% for tag in post.tags.all %}
+                                    <span class="views-count"> <a href="#">.{{ tag.name }} 标签</a></span>
+                                {% empty %}
+                                {% endfor %}
                             </div>
                         </header>
                         <div class="entry-content clearfix">

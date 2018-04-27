@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import Post, Category
+from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
@@ -181,7 +181,9 @@ class PostDetailView(DetailView):
         post.body = markdown.markdown(post.body,
                                       extensions=[
                                           'markdown.extensions.extra',
+                                          # 代码高亮
                                           'markdown.extensions.codehilite',
+                                          # 自动生成目录
                                           'markdown.extensions.toc',
                                       ])
         return post
@@ -195,3 +197,13 @@ class PostDetailView(DetailView):
             'comment_list': comment_list
         })
         return context
+
+
+class TagView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
+
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs.get('pk'))
+        return super(TagView, self).get_queryset().filter(tags=tag)
