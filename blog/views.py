@@ -6,6 +6,8 @@ from .models import Post, Category, Tag
 import markdown
 from comments.forms import CommentForm
 from django.views.generic import ListView, DetailView
+from django.utils.text import slugify
+from markdown.extensions.toc import TocExtension
 
 
 # def index(request):
@@ -178,14 +180,22 @@ class PostDetailView(DetailView):
 
     def get_object(self, queryset=None):
         post = super(PostDetailView, self).get_object(queryset=None)
-        post.body = markdown.markdown(post.body,
-                                      extensions=[
-                                          'markdown.extensions.extra',
-                                          # 代码高亮
-                                          'markdown.extensions.codehilite',
-                                          # 自动生成目录
-                                          'markdown.extensions.toc',
-                                      ])
+        # post.body = markdown.markdown(post.body,
+        #                               extensions=[
+        #                                   'markdown.extensions.extra',
+        #                                   # 代码高亮
+        #                                   'markdown.extensions.codehilite',
+        #                                   # 自动生成目录
+        #                                   'markdown.extensions.toc',
+        #                               ])
+
+        md = markdown.Markdown(extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+            TocExtension(slugify=slugify),
+        ])
+        post.body = md.convert(post.body)
+        Post.toc = md.toc
         return post
 
     def get_context_data(self, **kwargs):
